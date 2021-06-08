@@ -1,9 +1,4 @@
 bd () {
-  (($#<1)) && {
-    print -- "usage: $0 <name-of-any-parent-directory>"
-    print -- "       $0 <number-of-folders>"
-    return 1
-  } >&2
   # example:
   #   $PWD == /home/arash/abc ==> $num_folders_we_are_in == 3
   local num_folders_we_are_in=${#${(ps:/:)${PWD}}}
@@ -18,12 +13,30 @@ bd () {
     parents=($parents "$(echo $PWD | cut -d'/' -f$i)")
   done
   parents=($parents "/")
+  local arg=$1
+  if (($#<1))
+  then
+    if type fzf &> /dev/null
+    then
+      IFS=$'\n'
+      arg="$(fzf <<< $parents)"
+      result=$?
+      if [ $result > 0 ]
+      then
+        return $result
+      fi
+    else
+      cd ..
+      return
+    fi
+  fi
+
   # Build dest and 'cd' to it
   local parent
   foreach parent (${parents})
   do
     dest+="../"
-    if [[ $1 == $parent ]]
+    if [[ $arg == $parent ]]
     then
       cd $dest
       return 0
@@ -32,14 +45,14 @@ bd () {
 
   # If the user provided an integer, go up as many times as asked
   dest="./"
-  if [[ "$1" = <-> ]]
+  if [[ "$arg" = <-> ]]
   then
-    if [[ $1 -gt $num_folders_we_are_in ]]
+    if [[ $arg -gt $num_folders_we_are_in ]]
     then
-      print -- "bd: Error: Can not go up $1 times (not enough parent directories)"
+      print -- "bd: Error: Can not go up $arg times (not enough parent directories)"
       return 1
     fi
-    for i in {1..$1}
+    for i in {1..$arg}
     do
       dest+="../"
     done
@@ -48,7 +61,7 @@ bd () {
   fi
 
   # If the above methods fail
-  print -- "bd: Error: No parent directory named '$1'"
+  print -- "bd: Error: No parent directory named '$arg'"
   return 1
 }
 _bd () {
