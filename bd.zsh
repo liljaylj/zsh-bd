@@ -18,10 +18,11 @@ bd () {
   then
     if type fzf &> /dev/null
     then
-      IFS=$'\n'
+      local IFS=$'\n'
       arg="$(fzf <<< $parents)"
       result=$?
-      if [ $result > 0 ]
+      unset IFS
+      if [ $result -gt 0 ]
       then
         return $result
       fi
