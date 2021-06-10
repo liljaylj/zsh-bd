@@ -37,7 +37,7 @@ bd () {
   foreach parent (${parents})
   do
     dest+="../"
-    if [[ $arg == $parent ]]
+    if [[ $parent = *$arg* ]]
     then
       cd $dest
       return 0
