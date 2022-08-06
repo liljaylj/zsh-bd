@@ -19,7 +19,7 @@ bd () {
     if type fzf &> /dev/null
     then
       local IFS=$'\n'
-      arg="$(fzf <<< $parents)"
+      arg="$(fzf --height=40% <<< $parents)"
       result=$?
       unset IFS
       if [ $result -gt 0 ]
