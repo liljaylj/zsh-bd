@@ -4,6 +4,9 @@ bd () {
   local num_folders_we_are_in=${#${(ps:/:)${PWD}}}
   local dest="./"
 
+  # This will be used for case-insensitive matching
+  set -o extendedglob
+
   # First try to find a folder with matching name (could potentially be a number)
   # Get parents (in reverse order)
   local parents
@@ -37,7 +40,7 @@ bd () {
   foreach parent (${parents})
   do
     dest+="../"
-    if [[ $parent = *$arg* ]]
+	if [[ $parent = (#i)*$arg* ]]
     then
       cd $dest
       return 0
